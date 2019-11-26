@@ -1,4 +1,4 @@
-package com.example.wheresbobby;
+package com.example.wheresbobbypopup;
 
 import android.content.Context;
 
@@ -22,6 +22,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getInstrumentation().getTargetContext();
 
-        assertEquals("com.example.wheresbobby", appContext.getPackageName());
+        assertEquals("com.example.wheresbobbypopup", appContext.getPackageName());
     }
 }
