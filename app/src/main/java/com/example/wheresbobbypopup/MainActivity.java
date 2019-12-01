@@ -15,6 +15,8 @@ public class MainActivity extends AppCompatActivity {
     int dislikeCount = 0;
     Button likeBtn;
     Button dislikeBtn;
+    Button btnComment;
+    TextView txtclose;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,11 +26,9 @@ public class MainActivity extends AppCompatActivity {
     }
 
     public void ShowPopup(View v) {
-        TextView txtclose;
-        Button btnComment;
         myDialog.setContentView(R.layout.custompopup);
-        txtclose = (TextView) myDialog.findViewById(R.id.txtclose);
-        btnComment = (Button) myDialog.findViewById(R.id.btn_comment);
+        txtclose = myDialog.findViewById(R.id.txtclose);
+        btnComment = myDialog.findViewById(R.id.btn_comment);
         txtclose.setText("X");
         txtclose.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -36,11 +36,11 @@ public class MainActivity extends AppCompatActivity {
                 myDialog.dismiss();
             }
         });
-        btnComment.setOnClickListener(new Button.OnClickListener() {
+        btnComment.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 likeCount += 1;
-                likeBtn.setText(String.valueOf(likeCount));
+                btnComment.setText(String.valueOf(likeCount));
             }
         });
         myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
