@@ -58,27 +58,16 @@
             android:layout_width="0dp"
             android:layout_height="100dp">
 
-            <TextView
-                android:id="@+id/like_count"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:layout_margin="8dp"
-                android:layout_marginTop="16dp"
-                android:gravity="center"
-                android:text="0"
-                android:textSize="60sp" />
-
             <Button
                 android:id="@+id/btn_like"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:gravity="center"
-                android:text="+ 23"
+                android:text="LIKE!"
                 android:background="@drawable/buttonstyle"
                 android:textColor="@color/white"
 
-                android:textSize="30sp" />
+                android:textSize="20sp" />
         </LinearLayout>
         <LinearLayout
             android:gravity="center"
@@ -91,10 +80,10 @@
                 android:id="@+id/btn_dislike"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="- 5"
+                android:text="DISLIKE"
                 android:background="@drawable/buttonstyle"
                 android:textColor="@color/white"
-                android:textSize="30sp"
+                android:textSize="20sp"
                 android:gravity="center"
                 />
         </LinearLayout>
@@ -111,7 +100,7 @@
                 android:id="@+id/btn_comment"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="0"
+                android:text="comment"
                 android:layout_gravity="center_horizontal"
                 android:background="@drawable/buttonstyle"
                 android:textColor="@color/white"/>
