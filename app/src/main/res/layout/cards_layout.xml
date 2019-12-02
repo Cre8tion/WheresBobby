@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:tag="cards main container">
+
+    <androidx.cardview.widget.CardView
+        android:id="@+id/card_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        card_view:cardBackgroundColor="#ffff"
+        card_view:cardCornerRadius="10dp"
+        card_view:cardElevation="5dp"
+        card_view:cardUseCompatPadding="true">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="411dp"
+            android:layout_height="105dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/dashBoardFeedback"
+                android:layout_width="300dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:text="user comment,hello hello hello"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="15sp"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.095"
+                card_view:layout_constraintStart_toEndOf="@+id/dashBoardProfilePicture"
+                card_view:layout_constraintTop_toBottomOf="@+id/dashBoardUsername"
+                card_view:layout_constraintVertical_bias="0.187" />
+
+            <ImageView
+                android:id="@+id/dashBoardProfilePicture"
+                android:layout_width="62dp"
+                android:layout_height="46dp"
+                android:layout_margin="5dp"
+                android:layout_weight="1"
+                android:src="@drawable/ic_account_circle_black_24dp"
+                android:tag="image_tag"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.014"
+                card_view:layout_constraintStart_toStartOf="parent"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.228" />
+
+            <TextView
+                android:id="@+id/dashBoardUsername"
+                android:layout_width="250dp"
+                android:layout_height="20dp"
+                android:layout_gravity="center_horizontal"
+                android:text="user name"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="15sp"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.029"
+                card_view:layout_constraintStart_toEndOf="@+id/dashBoardProfilePicture"
+                card_view:layout_constraintTop_toTopOf="parent"
+                card_view:layout_constraintVertical_bias="0.158" />
+
+            <ImageView
+                android:id="@+id/dashBoardLikeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.632"
+                card_view:layout_constraintStart_toStartOf="parent"
+                card_view:layout_constraintTop_toBottomOf="@+id/dashBoardFeedback"
+                card_view:layout_constraintVertical_bias="0.416"
+                card_view:srcCompat="@drawable/ic_thumb_up_black_24dp" />
+
+            <ImageView
+                android:id="@+id/dashBoardDislikeIcon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.142"
+                card_view:layout_constraintStart_toEndOf="@+id/dashBoardLikeCount"
+                card_view:layout_constraintTop_toBottomOf="@+id/dashBoardFeedback"
+                card_view:layout_constraintVertical_bias="0.4"
+                card_view:srcCompat="@drawable/ic_thumb_down_black_24dp" />
+
+            <TextView
+                android:id="@+id/dashBoardLikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="4dp"
+                android:text="000"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.093"
+                card_view:layout_constraintStart_toEndOf="@+id/dashBoardLikeIcon"
+                card_view:layout_constraintTop_toBottomOf="@+id/dashBoardFeedback"
+                card_view:layout_constraintVertical_bias="0.421" />
+
+            <TextView
+                android:id="@+id/dashBoardDislikeCount"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="000"
+                card_view:layout_constraintBottom_toBottomOf="parent"
+                card_view:layout_constraintEnd_toEndOf="parent"
+                card_view:layout_constraintHorizontal_bias="0.219"
+                card_view:layout_constraintStart_toEndOf="@+id/dashBoardDislikeIcon"
+                card_view:layout_constraintTop_toBottomOf="@+id/dashBoardFeedback"
+                card_view:layout_constraintVertical_bias="0.333" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.cardview.widget.CardView>
+
+</LinearLayout>

@@ -42,6 +42,7 @@ public class MainActivity extends AppCompatActivity {
             Log.d("EMAIL", user.getEmail().toString());
             Log.d("VERIFIED", Boolean.toString(user.isEmailVerified()));
             Log.d("UID", user.getUid());
+            Log.d("Image", String.valueOf(user.getPhotoUrl()));
             if (user.isEmailVerified()){
                 Log.d("TAG", "Success, already logged in");
                 proceed();
