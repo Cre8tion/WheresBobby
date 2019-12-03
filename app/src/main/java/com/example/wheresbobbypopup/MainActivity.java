@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
         });
         likeBtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v) {
+            public void  onClick(View v) {
                 likeCount += 1;
                 likeBtn.setText(String.valueOf(likeCount));
             }
