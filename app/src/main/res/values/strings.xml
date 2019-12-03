@@ -2,4 +2,5 @@
     <string name="app_name">Where\'s Bobby</string>
     <string name="drawer_open">Open navigation drawer</string>
     <string name="drawer_close">Close navigation drawer</string>
+    <string name="title_activity_canteen_pano">CanteenPanoActivity</string>
 </resources>

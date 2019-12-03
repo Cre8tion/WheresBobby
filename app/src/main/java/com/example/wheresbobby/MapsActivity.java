@@ -96,7 +96,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
     public boolean onOptionsItemSelected(MenuItem item){
         int id = item.getItemId();
         if(id == R.id.canteen){
-            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(MapsActivity.this, CanteenPanoActivity.class);
             startActivity(intent);
         }
         if(id == R.id.goToSUTD){
@@ -201,7 +201,7 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
          * INTENT CALL HERE CANTEEN
          */
         if(marker.equals(mSUTDcanteen)){
-            Intent intent = new Intent(MapsActivity.this, ProfileActivity.class);
+            Intent intent = new Intent(MapsActivity.this, CanteenPanoActivity.class);
             startActivity(intent);
         }
         if(marker.equals(mSUTDlibrary)){
