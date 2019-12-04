@@ -164,7 +164,34 @@ public class CanteenPanoActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 Toast.makeText(CanteenPanoActivity.this, bobby.getId() + " bobby is clicked", Toast.LENGTH_SHORT).show();
-
+                myDialog.setContentView(R.layout.custompopup);
+                txtclose = myDialog.findViewById(R.id.txtclose);
+                btnComment = myDialog.findViewById(R.id.btn_comment);
+                likeBtn = myDialog.findViewById(R.id.btn_like);
+                dislikeBtn = myDialog.findViewById(R.id.btn_dislike);
+                txtclose.setText("X");
+                txtclose.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        myDialog.dismiss();
+                    }
+                });
+                likeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        likeCount += 1;
+                        likeBtn.setText(String.valueOf(likeCount));
+                    }
+                });
+                dislikeBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        dislikeCount -= 1;
+                        dislikeBtn.setText(String.valueOf(dislikeCount));
+                    }
+                });
+                myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
+                myDialog.show();
             }
         });
         constrain.addView(bobby);
@@ -212,9 +239,9 @@ public class CanteenPanoActivity extends AppCompatActivity {
                                 bobbypositions[2] = document.getData().get("id").toString();
 
                                 Log.d("jiayue", document.getId() + " position X => " + bobbypositions[0]);
-                                Log.d("jiayue - position Y:",document.getData().get("positionY").toString());
+                                Log.d("jiayue - position Y:",bobbypositions[1]);
 
-                                createBobby(campuscenter,constrain,bobbypositions);
+                                createBobby(constrain,bobbypositions);
                             }
                         } else {
                             Log.d("jiayue", "Error getting documents: ", task.getException());
@@ -224,13 +251,13 @@ public class CanteenPanoActivity extends AppCompatActivity {
                 });
     }
 
-    public void createBobby( ImageView v, ConstraintLayout constrain, String[] bobbypositions){
+    public void createBobby( ConstraintLayout constrain, String[] bobbypositions){
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                                         ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT); //WRAP_CONTENT param can be FILL_PARENT
         params.leftMargin = Integer.parseInt(bobbypositions[0]);
-        params.rightMargin = Integer.parseInt(bobbypositions[1]);
-        params.leftToLeft = v.getId();
-        params.topToTop = v.getId();
+        params.topMargin = Integer.parseInt(bobbypositions[1]);
+        params.leftToLeft = constrain.getId();
+        params.topToTop = constrain.getId();
         params.height = (int) convertDpToPixel(75, CanteenPanoActivity.this);
         params.width = (int) convertDpToPixel(75, CanteenPanoActivity.this);
 
