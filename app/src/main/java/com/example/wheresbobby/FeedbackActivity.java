@@ -28,7 +28,6 @@ public class FeedbackActivity extends AppCompatActivity {
     public void ShowPopup(View v) {
         myDialog.setContentView(R.layout.custompopup);
         txtclose = myDialog.findViewById(R.id.txtclose);
-        btnComment = myDialog.findViewById(R.id.btn_comment);
         likeBtn = myDialog.findViewById(R.id.btn_like);
         dislikeBtn = myDialog.findViewById(R.id.btn_dislike);
         txtclose.setText("X");

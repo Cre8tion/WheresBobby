@@ -59,6 +59,8 @@ public class Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_dashboard);
 
+        Utils.remindOnline(this);
+
         toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -91,7 +93,7 @@ public class Dashboard extends AppCompatActivity {
             public void onClick(View v) {
                 FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
                 Query query = rootRef.collection("feedbacks").whereEqualTo("user", user.getEmail().toString())
-                        .orderBy("timestamp", Query.Direction.DESCENDING);
+                        .orderBy("timestamp", Query.Direction.DESCENDING).limit(10);
 
                 FirestoreRecyclerOptions<FeedbackModel> HistoryOptions = new FirestoreRecyclerOptions.Builder<FeedbackModel>()
                         .setQuery(query, FeedbackModel.class)
@@ -111,7 +113,7 @@ public class Dashboard extends AppCompatActivity {
                 Date beginningDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
                 Query query = rootRef.collection("feedbacks").whereGreaterThanOrEqualTo("timestamp",beginningDate)
-                        .orderBy("timestamp", Query.Direction.DESCENDING).orderBy("users", Query.Direction.DESCENDING);
+                        .orderBy("timestamp", Query.Direction.DESCENDING).orderBy("likecounts", Query.Direction.DESCENDING).limit(10);
 
                 FirestoreRecyclerOptions<FeedbackModel> HistoryOptions = new FirestoreRecyclerOptions.Builder<FeedbackModel>()
                         .setQuery(query, FeedbackModel.class)
@@ -127,7 +129,7 @@ public class Dashboard extends AppCompatActivity {
             public void onClick(View v) {
                 FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
                 Query query = rootRef.collection("feedbacks")
-                        .orderBy("timestamp", Query.Direction.DESCENDING);
+                        .orderBy("timestamp", Query.Direction.DESCENDING).limit(10);
 
                 FirestoreRecyclerOptions<FeedbackModel> HistoryOptions = new FirestoreRecyclerOptions.Builder<FeedbackModel>()
                         .setQuery(query, FeedbackModel.class)
