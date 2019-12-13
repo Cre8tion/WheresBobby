@@ -5,22 +5,19 @@ import com.google.firebase.firestore.PropertyName;
 
 
 public class CommentModel {
-    private String text, user;
+    private String comment;
 
     public CommentModel() {}
 
-    public CommentModel(String text, String user) {
-        this.text = text;
-        this.user = user;
+    public CommentModel(String commentr) {
+        this.comment = comment;
+        // this.poster = poster;
     }
-    @PropertyName("text")
-    public String getComment() {return text;}
 
-    public String getText() {return text;}
+    public String getComment() {return comment;}
 
-    @PropertyName("user")
-    public String getUsername(){
-        return user;
-    }
+    /* public String getPoster(){
+        return poster;
+    }*/
 
 }

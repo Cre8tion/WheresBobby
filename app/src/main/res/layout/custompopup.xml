@@ -3,9 +3,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical"
-    android:layout_width="350dp"
-    android:layout_height="550dp"
-
+    android:layout_width="400dp"
+    android:layout_height="600dp"
+    android:background="@drawable/rounded_corner_feedback"
     android:padding="5dp"
     android:layout_gravity="center">
 
@@ -18,7 +18,7 @@
         android:gravity="center"
         android:text="X"
 
-        android:textStyle="bold" />
+        android:textStyle="bold"/>
 
     <ImageView
         android:id="@+id/imageView"
@@ -30,31 +30,28 @@
         android:id="@+id/textView4"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center"
-        android:text="Username" />
+        android:gravity="center" />
 
     <LinearLayout
         android:layout_width="350dp"
         android:layout_height="77dp"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:layout_gravity="center_horizontal">
 
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:id="@+id/feedback_display"
+            android:layout_width="332dp"
+            android:layout_height="62dp"
+
             android:layout_gravity="center_horizontal"
             android:layout_marginTop="5dp"
-            android:text="Students sleeping in the middle of campus centre"
-
+            android:gravity="center_vertical"
+            android:text="bobby sleep"
+            android:textAlignment="textStart"
+            android:textAllCaps="false"
+            android:textSize="18sp"
             android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-
-            android:layout_marginTop="5dp"
-            android:text="Voice of Student Feedback sleeping. Find Bobby!" />
     </LinearLayout>
 
     <LinearLayout
@@ -81,6 +78,15 @@
                 android:textSize="18sp"
 
                 />
+
+            <TextView
+                android:id="@+id/like_count_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textAlignment="center"
+                android:textAllCaps="false"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <LinearLayout
@@ -101,6 +107,14 @@
                 android:text="DISLIKE"
                 android:textColor="#ffff"
                 android:textSize="18sp" />
+
+            <TextView
+                android:id="@+id/dislike_count_view"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textAlignment="center"
+                android:textStyle="bold" />
         </LinearLayout>
         android:background="@drawable/buttonstyle"
 
@@ -118,16 +132,15 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_marginTop="10dp">
+        android:layout_marginTop="10dp"
+        android:layout_gravity="center_horizontal">
 
         <EditText
             android:id="@+id/addComment"
             android:layout_width="275dp"
             android:layout_height="wrap_content"
             android:hint="Write a comment...."
-
-
-            />
+            android:layout_marginLeft="35dp"/>
 
         <Button
             android:id="@+id/confirmComment"

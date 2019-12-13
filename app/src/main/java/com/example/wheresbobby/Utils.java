@@ -14,6 +14,11 @@ public class Utils {
 
     static final String UTILS_TAG = "UtilsTag";
 
+
+    /**
+     * Builds the URL to call API from
+     * @return URL object with the website string
+     */
     public static URL buildURL(){
 
         String scheme = "https";
@@ -40,6 +45,11 @@ public class Utils {
 
     }
 
+    /**
+     * Checks if Network Connection is present
+     * @param context Current Activity
+     * @return True/False
+     */
     static boolean isNetworkAvailable(Context context) {
 
         ConnectivityManager connectivityManager
@@ -50,6 +60,11 @@ public class Utils {
         return haveNetwork;
     }
 
+    /**
+     * Generates a Toast to remind the user to turn on their network connection for the application
+     * to function
+     * @param context Current Activity
+     */
     static void remindOnline(Context context){
         if(!isNetworkAvailable(context)){
             Toast.makeText(context, "Internet Connection is required for the application to work!", Toast.LENGTH_LONG).show();

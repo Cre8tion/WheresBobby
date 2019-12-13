@@ -12,6 +12,9 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.Map;
 
 public class EmailSent extends AppCompatActivity {
 
@@ -21,10 +24,19 @@ public class EmailSent extends AppCompatActivity {
         setContentView(R.layout.activity_email_sent);
     }
 
+    /**
+     * Calls to check if Email is verified in Firebase
+     * @param view Current Activity
+     */
     public void emailCheck(View view){
         Intent intent = new Intent(EmailSent.this, MainActivity.class);
         startActivity(intent);
     }
+
+    /**
+     * Calls when send email button is clicked to send new verification email again
+     * @param view Current Activity
+     */
 
     public void sendEmail(View view){
         FirebaseAuth mAuth = FirebaseAuth.getInstance();

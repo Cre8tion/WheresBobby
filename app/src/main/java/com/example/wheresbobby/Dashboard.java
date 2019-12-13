@@ -18,6 +18,7 @@ import com.google.firebase.firestore.Query;
 
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,8 +51,10 @@ public class Dashboard extends AppCompatActivity {
     Button TrendingFeedbackButton, FeedbackHistoryButton, LatestFeedbackButton;
     FloatingActionButton MapsButton;
     RecyclerView recyclerView;
+    TextView welcome_text;
 
     private FirebaseAuth mAuth;
+    private SharedPreferences preferences;
 
 
     @Override
@@ -86,13 +89,19 @@ public class Dashboard extends AppCompatActivity {
         TrendingFeedbackButton = findViewById(R.id.TrendingFeedbackButton);
         LatestFeedbackButton = findViewById(R.id.LatestFeedbackButton);
         MapsButton = (FloatingActionButton) findViewById(R.id.MapsButton);
+        welcome_text = findViewById(R.id.welcome_text);
 
+        preferences = getSharedPreferences(getResources().getString(R.string.pref_file), MODE_PRIVATE);
+        String user_email = preferences.getString("email", "jenny_@");
+        String[] temp = user_email.split("_");
+        String user_name = temp[0].substring(0, 1).toUpperCase() + temp[0].substring(1);
+        welcome_text.setText("Welcome back, " + user_name + "!");
 
         FeedbackHistoryButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
-                Query query = rootRef.collection("feedbacks").whereEqualTo("user", user.getEmail().toString())
+                Query query = rootRef.collection("feedbacks").whereEqualTo("poster", user.getEmail().toString())
                         .orderBy("timestamp", Query.Direction.DESCENDING).limit(10);
 
                 FirestoreRecyclerOptions<FeedbackModel> HistoryOptions = new FirestoreRecyclerOptions.Builder<FeedbackModel>()
@@ -109,11 +118,11 @@ public class Dashboard extends AppCompatActivity {
             public void onClick(View v) {
                 FirebaseFirestore rootRef = FirebaseFirestore.getInstance();
 
-                LocalDate date = LocalDate.now().minusDays(30);
-                Date beginningDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
+                //LocalDate date = LocalDate.now().minusDays(30);
+                //Date beginningDate = Date.from(date.atStartOfDay(ZoneId.systemDefault()).toInstant());
 
-                Query query = rootRef.collection("feedbacks").whereGreaterThanOrEqualTo("timestamp",beginningDate)
-                        .orderBy("timestamp", Query.Direction.DESCENDING).orderBy("likecounts", Query.Direction.DESCENDING).limit(10);
+                Query query = rootRef.collection("feedbacks")//.whereGreaterThanOrEqualTo("timestamp",beginningDate)
+                        .orderBy("timestamp", Query.Direction.DESCENDING).orderBy("likes_count", Query.Direction.DESCENDING).limit(10);
 
                 FirestoreRecyclerOptions<FeedbackModel> HistoryOptions = new FirestoreRecyclerOptions.Builder<FeedbackModel>()
                         .setQuery(query, FeedbackModel.class)
@@ -157,23 +166,8 @@ public class Dashboard extends AppCompatActivity {
             @Override
             protected void onBindViewHolder(@NonNull FeedbackViewHolder holder, int position, @NonNull FeedbackModel model) {
                 holder.setFeedback(model.getFeedback());
-                holder.setUsername(model.getUsername());
-                ArrayList likesarray = model.getLikes();
-                ArrayList dislikesarray = model.getDislikes();
-                if(likesarray == null){
-                    holder.setTotalLikes(0);
-                }
-                else{
-                    holder.setTotalLikes(likesarray.size());
-                }
-
-                if(dislikesarray == null){
-                    holder.setTotalDislikes(0);
-                }
-                else{
-                    holder.setTotalDislikes(dislikesarray.size());
-                }
-
+                holder.setTotalLikes(model.getLikes_Count());
+                holder.setTotalDislikes(model.getDislikes_Count());
             }
 
             @NonNull
@@ -230,12 +224,13 @@ public class Dashboard extends AppCompatActivity {
 
         void setTotalLikes(Integer TotalLikes){
             TextView totallikesView = view.findViewById(R.id.dashBoardLikeCount);
-            totallikesView.setText(TotalLikes.toString());
+            totallikesView.setText(String.valueOf(TotalLikes));
         }
 
         void setTotalDislikes(Integer TotalDislikes){
             TextView totalDislikesView = view.findViewById(R.id.dashBoardDislikeCount);
-            totalDislikesView.setText(TotalDislikes.toString());
+            Log.d("DISLIKES:", String.valueOf(TotalDislikes));
+            totalDislikesView.setText(String.valueOf(TotalDislikes));
         }
     }
 
@@ -294,7 +289,8 @@ public class Dashboard extends AppCompatActivity {
                  */
                 break;
             case R.id.map:
-                break;
+                Intent mapIntent = new Intent(Dashboard.this, MapsActivity.class);
+                startActivity(mapIntent);
             default:
                 break;
         }

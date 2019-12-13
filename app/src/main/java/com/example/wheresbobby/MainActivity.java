@@ -21,7 +21,6 @@ import java.util.Random;
 
 public class MainActivity extends AppCompatActivity {
 
-    private static final String pref_file ="com.example.wheresbobby.sharedprefs";
     private FirebaseAuth mAuth;
     SharedPreferences preferences;
 
@@ -30,11 +29,16 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        preferences = getSharedPreferences(pref_file, MODE_PRIVATE);
+        preferences = getSharedPreferences(getResources().getString(R.string.pref_file), MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
         checkAuth();
     }
 
+    /**
+     * Start checking if there is an existing user registered and saved in the application
+     * If not,
+     * check with Firebase or wait for user to register with school email
+     */
     public void checkAuth(){
         FirebaseUser user = mAuth.getCurrentUser();
         if (user != null){
@@ -91,11 +95,22 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Check if email is valid SUTD email and prompt user if it is not, register the user in
+     * Firebase if it valid
+     */
     public void registerAccount(){
         EditText inp = (EditText) findViewById(R.id.email_input);
         String email = inp.getText().toString();
         String token = getToken();
         SharedPreferences.Editor editor = preferences.edit();
+        if (email.substring(email.length()-11, email.length()).equals("sutd.edu.sg")){
+            //
+        }else{
+            Log.d("TAG", email.substring(email.length()-12, email.length()));
+            Toast.makeText(MainActivity.this, "Please enter an SUTD email.", Toast.LENGTH_SHORT).show();
+            return;
+        }
         editor.putString("email", email);
         editor.putString("token", token);
         editor.apply();
@@ -117,6 +132,10 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Check if user has verified from the email sent
+     * @param user Firebase user
+     */
     public void doVerification(FirebaseUser user){
         // Send verification email to user, then direct them to wait page.
         String email = user.getEmail();
@@ -139,6 +158,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
+    /**
+     * Function to generate a unique ID token randomly
+     * @return Unique ID token
+     */
     public String getToken(){
 
         int left = 33;
@@ -157,11 +180,18 @@ public class MainActivity extends AppCompatActivity {
         return token;
     }
 
+    /**
+     * Called when user is present in device and Starts Dashboard Activity
+     */
     public void proceed(){
         Intent intent = new Intent(MainActivity.this, Dashboard.class);
         startActivity(intent);
     }
 
+    /**
+     * Called when Login Button is pressed
+     * @param view View which button is present and pressed
+     */
     public void loginButton(View view){
         registerAccount();
     }

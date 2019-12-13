@@ -175,6 +175,11 @@ public class MapsActivity extends AppCompatActivity implements OnMapReadyCallbac
         }
     }
 
+    /**
+     * Called when marker on Google Maps Activity is pressed
+     * @param marker marker on Google Maps
+     * @return True/False
+     */
     @Override
     public boolean onMarkerClick(final Marker marker){
         if(marker.equals(mSUTDcanteen)|| marker.equals(mSUTDlibrary)){

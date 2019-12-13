@@ -7,40 +7,32 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class FeedbackModel {
-    private String text, user;
-    private Timestamp timestamp;
-    private Integer area_id;
-    private ArrayList<HashMap<String, String>> likes, dislikes;
+    private String feedback, poster;
+    private Integer area_id, timestamp, likes_count, dislikes_count;
 
     public FeedbackModel() {}
 
-    public FeedbackModel(String text, String user, Timestamp timestamp, Integer area_id, ArrayList<HashMap<String, String>> likes, ArrayList<HashMap<String, String>> dislikes) {
-        this.text = text;
-        this.user = user;
+    public FeedbackModel(String feedback, String poster, Integer area_id, Integer timestamp, Integer likes_count, Integer dislikes_count) {
+        this.feedback = feedback;
+        this.poster = poster;
         this.timestamp = timestamp;
         this.area_id = area_id;
-        this.likes = likes;
-        this.dislikes = dislikes;
+        this.likes_count = likes_count;
+        this.dislikes_count = dislikes_count;
     }
 
-    public String getFeedback() {return text;}
+    public String getFeedback() {return feedback;}
 
-    public String getText() {return text;}
-
-
-    @PropertyName("user")
-    public String getUsername(){
-        return user;
+    public String getPoster(){
+        return poster;
     }
 
-    @PropertyName("likes")
-    public ArrayList<HashMap<String, String>> getLikes(){
-        return likes;
+    public int getLikes_Count(){
+        return likes_count;
     }
 
-    @PropertyName("dislikes")
-    public ArrayList<HashMap<String,String>> getDislikes(){
-        return dislikes;
+    public int getDislikes_Count(){
+        return dislikes_count;
     }
 
 

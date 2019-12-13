@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -47,6 +48,7 @@ import android.widget.Toast;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Document;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
@@ -58,6 +60,8 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.util.Arrays;
+import java.util.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -69,6 +73,11 @@ public class CanteenPanoActivity extends AppCompatActivity {
     private int bobbyindex;
     private ImageView campuscenter;
     private ConstraintLayout constrain;
+    private int likes_amount;
+    private int dislikes_amount;
+
+    private boolean user_likes;
+    private boolean user_dislikes;
 
     private FirebaseAuth mAuth;
     private FirebaseUser user;
@@ -85,6 +94,9 @@ public class CanteenPanoActivity extends AppCompatActivity {
     Button likeBtn;
     Button dislikeBtn;
     TextView txtclose;
+    TextView feedback_text;
+    TextView dislike_text;
+    TextView like_text;
 
 
     @Override
@@ -116,6 +128,10 @@ public class CanteenPanoActivity extends AppCompatActivity {
             }
         });
 
+        Toolbar mActionBarToolbar = (Toolbar) findViewById(R.id.toolbar);
+        setSupportActionBar(mActionBarToolbar);
+        getSupportActionBar().setTitle("Campus Center");
+
         campuscenter.setOnTouchListener(new View.OnTouchListener() {
             @Override
             public boolean onTouch(View v, MotionEvent event) {
@@ -141,17 +157,30 @@ public class CanteenPanoActivity extends AppCompatActivity {
         firebaseCall();
     }
 
+    /*@Override
+    protected void onStop(){
+        super.onStop();
+        adapter.stopListening();
+    }*/
+
+    /***
+     * Helper Function to start the Firebase calls
+     */
     public void firebaseCall(){
         getMaxIndex();
     }
 
+
+    /***
+     * Function to call when trying to create a new feedback, which will call a AsyncTask to check
+     * if there is any profanity found, which only allow users to post feedback accordingly
+     */
     public void addNewFeedback(){
         myDialog.setContentView(R.layout.row_comment);
 
         Button PostFeedbackButton = myDialog.findViewById(R.id.PostFeedBackbutton);
-
         TextView comment_username = myDialog.findViewById(R.id.comment_username);
-        comment_username.setText(user.getEmail());
+        comment_username.setText("Posting as anonymous");
 
         final EditText comment_content = myDialog.findViewById(R.id.comment_content);
         PostFeedbackButton.setOnClickListener(new View.OnClickListener() {
@@ -177,41 +206,52 @@ public class CanteenPanoActivity extends AppCompatActivity {
 
     }
 
+    /***
+     * Helper function called to increase the maxIndex in Firebase by 1 and call function to add
+     * to the View
+     */
     public void feedBackCreated(){
-        createBobby(campuscenter,constrain);
-        bobbyindex += 1;
 
-        indexReference.update("maxIndex",bobbyindex).addOnSuccessListener(new OnSuccessListener<Void>() {
+        indexReference.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
             @Override
-            public void onSuccess(Void aVoid) {
-                Log.d("Update", "DocumentSnapshot successfully updated!");
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                bobbyindex = Integer.parseInt(documentSnapshot.getData().get("maxIndex").toString());
+                addOneBobby(campuscenter,constrain);
+                bobbyindex += 1;
+                indexReference.update("maxIndex", bobbyindex);
             }
-        })
-                .addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("Update", "Error updating document", e);
-                    }
-                });
+        });
 
         addbobby = false;
     }
 
+    /***
+     * Function to call a loop to populate the Layout with multiple ImageButtons
+     */
     public void setBobbys(){
         for (int i=0;i<bobbyindex;i++){
             getBobbyposition(i);
         }
     }
 
+    /***
+     * Function to convert dp to pixel for storage purposes
+     * @param dp value of dp
+     * @param context Current Activity
+     * @return value in pixel
+     */
     public static float convertDpToPixel(float dp, Context context) {
         return dp * ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
     }
 
-    /*public static float convertPixelsToDp(float px, Context context) {
-        return px / ((float) context.getResources().getDisplayMetrics().densityDpi / DisplayMetrics.DENSITY_DEFAULT);
-    }*/
+    /***
+     * Function to add a new ImageView to the panorama after feedback is posted and store the
+     * details in Firebase
+     * @param v Imageview to add to View
+     * @param constrain Panorama Layout for Imageview to be added to
+     */
 
-    public void createBobby(ImageView v, ConstraintLayout constrain){
+    public void addOneBobby(ImageView v, ConstraintLayout constrain){
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                 ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT); //WRAP_CONTENT param can be FILL_PARENT
 
@@ -226,7 +266,16 @@ public class CanteenPanoActivity extends AppCompatActivity {
         position.put("positionX", (int) lastTouchDownXY[0] - 90);
         position.put("positionY", (int) lastTouchDownXY[1] - 90);
         position.put("id",bobbyindex);
-        position.put("create",true);
+        position.put("poster", user.getEmail());
+        position.put("likes_count", 0);
+        position.put("dislikes_count", 0);
+        // Store the post ids that a person has liked in their users tab
+        Date now = new Date();
+        Long time = new Long(now.getTime()/1000);
+        int timestamp = time.intValue();
+        position.put("timestamp", timestamp);
+        position.put("feedback", currentFeedback);
+        position.put("area_id", 0); // AREA ID HARDCODED!!!
         db
                 .collection("feedbacks")
                 .document(""+bobbyindex)
@@ -241,41 +290,13 @@ public class CanteenPanoActivity extends AppCompatActivity {
         bobby.setBackground(null);
         bobby.setId(bobbyindex);
 
-        bobby.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Toast.makeText(CanteenPanoActivity.this, bobby.getId() + " bobby is clicked", Toast.LENGTH_SHORT).show();
-                myDialog.setContentView(R.layout.custompopup);
-                txtclose = myDialog.findViewById(R.id.txtclose);
-                likeBtn = myDialog.findViewById(R.id.btn_like);
-                dislikeBtn = myDialog.findViewById(R.id.btn_dislike);
-                txtclose.setText("X");
-                txtclose.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        myDialog.dismiss();
-                    }
-                });
-                likeBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        likeCount += 1;
-                        likeBtn.setText(String.valueOf(likeCount));
-                    }
-                });
-                dislikeBtn.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View v) {
-                        dislikeCount -= 1;
-                        dislikeBtn.setText(String.valueOf(dislikeCount));
-                    }
-                });
-                myDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
-                myDialog.show();
-            }
-        });
         constrain.addView(bobby);
+        getBobbyposition(bobbyindex);
     }
+
+    /***
+     * Get the maximum number of feedbacks available to start adding them to the View
+     */
 
     public void getMaxIndex() {
         Query query = db.collection("areas").whereEqualTo("id",0);
@@ -297,6 +318,11 @@ public class CanteenPanoActivity extends AppCompatActivity {
         });
     }
 
+    /***
+     * Retrieve Firebase data using index to search for document with matching id
+     * @param index id of feedback to retrieve
+     */
+
     public void getBobbyposition(int index){
         db.collection("feedbacks")
                 .whereEqualTo("id",index)
@@ -308,16 +334,21 @@ public class CanteenPanoActivity extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             for (QueryDocumentSnapshot document : task.getResult()) {
 
-                                String[] bobbypositions = new String[3];
+                                String[] bobbypositions = new String[7];
 
                                 bobbypositions[0] = document.getData().get("positionX").toString();
                                 bobbypositions[1] = document.getData().get("positionY").toString();
                                 bobbypositions[2] = document.getData().get("id").toString();
+                                bobbypositions[3] = document.getData().get("feedback").toString();
+                                bobbypositions[4] = document.getData().get("likes_count").toString();
+                                bobbypositions[5] = document.getData().get("dislikes_count").toString();
+                                bobbypositions[6] = document.getData().get("id").toString();
+                                // if want to show poster, just getdata poster and put in [7]
 
                                 Log.d("position X =>",bobbypositions[0]);
                                 Log.d("position Y =>",bobbypositions[1]);
 
-                                createBobby(constrain,bobbypositions);
+                                showBobby(constrain,bobbypositions);
                             }
                         } else {
                             Log.d("Error", "" + task.getException());
@@ -327,7 +358,15 @@ public class CanteenPanoActivity extends AppCompatActivity {
                 });
     }
 
-    public void createBobby( ConstraintLayout constrain, String[] bobbypositions){
+    /***
+     * Add new ImageButtons of Feedbacks to Layout of Panoramic view of Canteen
+     * @param constrain Layout to add new ImageButtons
+     * @param bobbypositions Array of document details to populate the ImageButton with
+     *                       including positions to set the ImageButton
+     */
+
+    public void showBobby( ConstraintLayout constrain, String[] bobbypositions){
+        // This function makes the bobby popup
         ConstraintLayout.LayoutParams params = new ConstraintLayout.LayoutParams(
                                         ConstraintLayout.LayoutParams.WRAP_CONTENT, ConstraintLayout.LayoutParams.WRAP_CONTENT); //WRAP_CONTENT param can be FILL_PARENT
         params.leftMargin = Integer.parseInt(bobbypositions[0]);
@@ -337,8 +376,12 @@ public class CanteenPanoActivity extends AppCompatActivity {
         params.height = (int) convertDpToPixel(75, CanteenPanoActivity.this);
         params.width = (int) convertDpToPixel(75, CanteenPanoActivity.this);
 
-
+        newDialog = new Dialog(CanteenPanoActivity.this);
         final ImageButton bobby = new ImageButton(CanteenPanoActivity.this);
+        final String feedback_content = bobbypositions[3];
+        likes_amount = Integer.parseInt(bobbypositions[4]);
+        dislikes_amount = Integer.parseInt(bobbypositions[5]);
+        bobbyindex = Integer.parseInt(bobbypositions[6]);
         bobby.setLayoutParams(params);
         Drawable bobbyhead = getResources().getDrawable(R.drawable.bobby_burned);
         bobby.setImageDrawable(bobbyhead);
@@ -346,15 +389,38 @@ public class CanteenPanoActivity extends AppCompatActivity {
         bobby.setBackground(null);
         bobby.setId(Integer.parseInt(bobbypositions[2]));
 
+        // (if not already done)
         bobby.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(CanteenPanoActivity.this, bobby.getId() + " bobby is clicked", Toast.LENGTH_SHORT).show();
+                bobbyindex = bobby.getId();
+                update_bools(bobbyindex);
+
+                DocumentReference post_ref = db.collection("feedbacks").document(Integer.toString(bobbyindex));
+                post_ref.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        likes_amount = Integer.parseInt(documentSnapshot.getData().get("likes_count").toString());
+                        dislikes_amount = Integer.parseInt(documentSnapshot.getData().get("dislikes_count").toString());
+                    }
+                });
+
+                // Toast.makeText(CanteenPanoActivity.this, bobby.getId() + " bobby is clicked", Toast.LENGTH_SHORT).show();
                 newDialog.setContentView(R.layout.custompopup);
 
                 txtclose = newDialog.findViewById(R.id.txtclose);
                 likeBtn = newDialog.findViewById(R.id.btn_like);
                 dislikeBtn = newDialog.findViewById(R.id.btn_dislike);
+                like_text = newDialog.findViewById(R.id.like_count_view);
+                dislike_text = newDialog.findViewById(R.id.dislike_count_view);
+                feedback_text = newDialog.findViewById(R.id.feedback_display);
+
+                Button add_comment = newDialog.findViewById(R.id.confirmComment);
+                like_text.setText(String.valueOf(likes_amount));
+                dislike_text.setText(String.valueOf(dislikes_amount));
+
+                feedback_text.setText(feedback_content);
+                Log.d("Feedback text set", feedback_content);
                 txtclose.setText("X");
                 txtclose.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -362,28 +428,111 @@ public class CanteenPanoActivity extends AppCompatActivity {
                         newDialog.dismiss();
                     }
                 });
+
+                final DocumentReference like_ref = db
+                        .collection("feedbacks").document(Integer.toString(bobbyindex))
+                        .collection("likes_users").document(user.getEmail());
+                final DocumentReference dislike_ref = db
+                        .collection("feedbacks").document(Integer.toString(bobbyindex))
+                        .collection("dislikes_users").document(user.getEmail());
+
                 likeBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        likeCount += 1;
-                        likeBtn.setText(String.valueOf(likeCount));
+                        // first check if user alr liked this
+                        if(!user_likes){
+                            likes_amount += 1;
+                            like_text.setText(String.valueOf(likes_amount));
+                            Map<String, Object> data = new HashMap<String, Object>();
+                            data.put("likes_count", likes_amount);
+                            db.collection("feedbacks").document(Integer.toString(bobbyindex))
+                                    .set(data, SetOptions.merge());
+                            data.clear();
+                            data.put("value", "1");
+                            like_ref.set(data, SetOptions.merge());
+                            user_likes = true;
+                            if(user_dislikes){
+                                dislikes_amount -= 1;
+                                dislike_text.setText(String.valueOf(dislikes_amount));
+                                data.clear();
+                                data.put("dislikes_count", dislikes_amount);
+                                db.collection("feedbacks").document(Integer.toString(bobbyindex))
+                                        .set(data, SetOptions.merge());
+                                data.clear();
+                                data.put("value", "0");
+                                dislike_ref.set(data, SetOptions.merge());
+                                user_dislikes = false;
+                            }
+                        }
+                        update_bools(bobbyindex);
                     }
                 });
                 dislikeBtn.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        dislikeCount -= 1;
-                        dislikeBtn.setText(String.valueOf(dislikeCount));
+                        if(!user_dislikes){
+                            dislikes_amount += 1;
+                            dislike_text.setText(String.valueOf(dislikes_amount));
+                            Map<String, Object> data = new HashMap<String, Object>();
+                            data.put("dislikes_count", dislikes_amount);
+                            db.collection("feedbacks").document(Integer.toString(bobbyindex))
+                                    .set(data, SetOptions.merge());
+                            data.clear();
+                            data.put("value", "1");
+                            dislike_ref.set(data, SetOptions.merge());
+                            user_dislikes = true;
+                            if (user_likes) {
+                                likes_amount -= 1;
+                                like_text.setText(String.valueOf(likes_amount));
+                                data.clear();
+                                data.put("likes_count", likes_amount);
+                                db.collection("feedbacks").document(Integer.toString(bobbyindex))
+                                        .set(data, SetOptions.merge());
+                                data.clear();
+                                data.put("value", "0");
+                                like_ref.set(data, SetOptions.merge());
+                                user_likes = false;
+                            }
+                        }
+                        update_bools(bobbyindex);
                     }
                 });
-                newDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.WHITE));
+
+                add_comment.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        final EditText comment_text = newDialog.findViewById(R.id.addComment);
+                        String comment = comment_text.getText().toString();
+                        if (comment.equals("")) return;
+                        Map<String, Object> data = new HashMap<String, Object>();
+                        data.put("id", bobbyindex);
+                        data.put("comment", comment);
+                        Date now = new Date();
+                        Long time = new Long(now.getTime()/1000);
+                        int timestamp = time.intValue();
+                        data.put("timestamp", timestamp);
+                        data.put("poster", user.getEmail());
+                        db.collection("comments")
+                                .add(data)
+                                .addOnSuccessListener(new OnSuccessListener<DocumentReference>() {
+                                    @Override
+                                    public void onSuccess(DocumentReference documentReference) {
+                                        comment_text.setText("");
+
+                                    }
+                                });
+                    }
+                });
+
+                newDialog.getWindow().setBackgroundDrawable(new ColorDrawable(Color.TRANSPARENT));
                 newDialog.show();
 
                 commentsView = (RecyclerView) newDialog.findViewById(R.id.recyclerCommentsView);
                 commentsView.setHasFixedSize(true);
                 commentsView.setLayoutManager(new LinearLayoutManager(newDialog.getContext()));
 
-                Query query = db.collection("comments").whereEqualTo("feedback_id", bobby.getId()).orderBy("timestamp", Query.Direction.DESCENDING);
+                Query query = db.collection("comments").whereEqualTo("id", bobbyindex)
+                        .orderBy("timestamp", Query.Direction.ASCENDING);
 
                 FirestoreRecyclerOptions<CommentModel> options = new FirestoreRecyclerOptions.Builder<CommentModel>()
                         .setQuery(query, CommentModel.class)
@@ -393,8 +542,9 @@ public class CanteenPanoActivity extends AppCompatActivity {
 
                     @Override
                     protected void onBindViewHolder(@NonNull CommentViewHolder holder, int position, @NonNull CommentModel model) {
+                        Log.d("Pos", String.valueOf(position));
                         holder.setFeedback(model.getComment());
-                        holder.setUsername(model.getUsername());
+                        // holder.setUsername(model.getPoster());
                     }
 
                     @NonNull
@@ -405,13 +555,69 @@ public class CanteenPanoActivity extends AppCompatActivity {
                     }
                 };
                 commentsView.setAdapter(adapter);
+                adapter.updateOptions(options);
+                adapter.startListening();
             }
         });
 
         constrain.addView(bobby);
     }
 
+    /** Assignment for whether or not user likes/dislikes.
+     * @param index id of feedback
+     */
 
+    void update_bools(int index) {
+
+        DocumentReference like_ref = db
+                .collection("feedbacks").document(Integer.toString(index))
+                .collection("likes_users").document(user.getEmail());
+        DocumentReference dislike_ref = db
+                .collection("feedbacks").document(Integer.toString(index))
+                .collection("dislikes_users").document(user.getEmail());
+
+        like_ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if (document.getData().get("value").toString().equals("1")) {
+                            user_likes = true;
+                        } else {
+                            user_likes = false;
+                        }
+                    } else {
+                        user_likes = false;
+                    }
+                } else {
+                    Log.d("ERROR", "get failed with ", task.getException());
+                }
+            }
+        });
+
+        dislike_ref.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if (document.getData().get("value").toString().equals("1")) {
+                            user_dislikes = true;
+                        } else {
+                            user_dislikes = false;
+                        }
+                    } else {
+                        user_dislikes = false;
+                    }
+                }
+            }
+        });
+    }
+
+    /***
+     * AsyncTask Class to call API to check if there is any profanity involved in the feedback
+     */
     private class profanityCheck extends AsyncTask<String, Void, String> {
 
         @Override
@@ -477,6 +683,10 @@ public class CanteenPanoActivity extends AppCompatActivity {
         }
     }
 
+    /** Represents a Viewholder for Holding Comments on Feedbacks
+     *  Holds multiple comments
+     */
+
     private class CommentViewHolder extends RecyclerView.ViewHolder {
         private View view;
 
@@ -490,9 +700,9 @@ public class CanteenPanoActivity extends AppCompatActivity {
             feedbacktextView.setText(feedback);
         }
 
-        void setUsername(String username){
+        /*void setUsername(String username){
             TextView usernametextView = view.findViewById(R.id.commentUsername);
             usernametextView.setText(username);
-        }
+        }*/
     }
 }
